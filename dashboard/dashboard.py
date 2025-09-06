@@ -160,13 +160,14 @@ def get_left():
                         style={
                             "display": "flex",
                             "flex-direction": "column",
-                            "justify-content": "center"
+                            "justify-content": "center",
+                            "align-self": "center"
                         }
                     ),
                 ], 
                 style={
                     "display": "flex", 
-                    "align-self": "flex-start", 
+                    "align-self": "center", 
                     "flex-direction": "column",
                     "justify-content": "center"
                 }
@@ -270,43 +271,66 @@ def update_graph(value, col):
     Input('color', 'value')
 )
 def update_stats_graph(value, col, color):
-    df = data[data["CountyName"] == value]
+    
+    df: pd.DataFrame = data[data["CountyName"] == value]
     
     # sns implementation
     
-    plt.figure()
-    sns.histplot(
-        data=df,
-        x=col,
-        multiple="layer",
-        hue=color,
-        common_norm=False,
-        common_bins=True,
-        stat="percent",
-        # binwidth=0.01
-    )
-    plt.tight_layout()
+    # plt.figure()
+    # sns.histplot(
+    #     data=df,
+    #     x=col,
+    #     multiple="layer",
+    #     hue=color,
+    #     common_norm=False,
+    #     common_bins=True,
+    #     stat="percent",
+    #     # binwidth=0.01
+    # )
+    # plt.tight_layout()
     
-    fig = tls.mpl_to_plotly(plt.gcf())
-    plt.close()
+    # fig = tls.mpl_to_plotly(plt.gcf())
+    # plt.close()
     
     # px implementation
     
     # fig = px.histogram(
-    #     df, x=col, color="LILATracts_1And10"
+    #     df, x=col, color=color, nbins=40
     # )
     
     # go implementation
     
-    # lila_1 = df[df["LILATracts_1And10"] == 1].loc[:, col]
-    # lila_0 = df[df["LILATracts_1And10"] == 0].loc[:, col]
+    lila_1 = df[df["LILATracts_1And10"] == 1].loc[:, col]
+    lila_0 = df[df["LILATracts_1And10"] == 0].loc[:, col]
     
-    # fig = go.Figure()
+    data_min = data[col].min()
+    data_max = data[col].max()
+    bin_width = (data_max - data_min) / 40
+    bins = dict(
+        start=data[col].min(),
+        end=data[col].max(),
+        size= bin_width
+    )
+    fig = go.Figure()
     
-    # fig.add_trace(go.Histogram(x=lila_0))
-    # fig.add_trace(go.Histogram(x=lila_1))
-    # fig.update_layout(barmode='overlay')
-    # fig.update_traces(opacity=0.75)
+    fig.add_trace(
+        go.Histogram(
+            x=lila_0,
+            histnorm="percent",
+            name=f"Not {color}",
+            xbins=bins,
+        )
+    )
+    fig.add_trace(
+        go.Histogram(
+            x=lila_1,
+            histnorm="percent",
+            name=f'{color}',
+            xbins=bins,            
+        )
+    )
+    fig.update_layout(barmode='overlay')
+    fig.update_traces(opacity=0.75)
     
     return fig
 
