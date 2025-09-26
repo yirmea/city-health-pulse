@@ -18,7 +18,6 @@ import plotly.express as px
 import plotly.tools as tls 
 import plotly.graph_objects as go 
 
-
 #utils
 from utils.dropdown import clean_data
 from utils.dropdown import get_colors
