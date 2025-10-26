@@ -1,7 +1,15 @@
 import pandas as pd
 import re
 
-
+values = [
+    "LILATracts_1And10",
+    "LILATracts_halfAnd10", 
+    "LILATracts_1And20", 
+    "LATracts1", 
+    "LATracts10", 
+    "LATracts20", 
+    "LATracts_half"
+]
 
 def clean_data(data: pd.DataFrame):
     
@@ -41,7 +49,7 @@ def clean_data(data: pd.DataFrame):
     
     return out
 
-def get_colors():
+def get_colors() -> dict:
     colors_dict = [
         {"value": 'LILATracts_1And10', "label": "Low Income & Low Access ( 1mi & 10mi )"},
         {"value": 'LILATracts_halfAnd10', "label": "Low Income & Low Access ( 0.5mi & 10mi )"},
@@ -53,3 +61,15 @@ def get_colors():
     ]
     
     return colors_dict
+
+def prune_indicator(data: pd.DataFrame):
+    # remove indicators if not present in data 
+    colors: list = get_colors()
+    for i in colors:
+        exists = sum(data[i["value"]])
+        if not exists:
+            item = {"value": i["value"], "label": i["label"]}
+            index = colors.index(item)
+            colors.pop(index)
+        
+    return colors

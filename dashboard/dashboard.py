@@ -20,7 +20,7 @@ import plotly.graph_objects as go
 
 #utils
 from utils.dropdown import clean_data
-from utils.dropdown import get_colors
+from utils.dropdown import get_colors, prune_indicator
 from scipy.stats import pearsonr
 
 use('agg')
@@ -227,6 +227,13 @@ def get_layout():
 app.layout = get_layout()
 
 @callback(
+    Output('color', 'options'),
+    Input('county', 'value')
+)
+def update_indicators(county):
+    return prune_indicator(data[data["CountyName"] == county])
+
+@callback(
     Output('county-graph', 'figure'),
     Input('county', 'value'),
     Input('column', 'value')
@@ -401,16 +408,25 @@ def update_stats(county, col, color):
             # "flex-grow": "0.2"
         }
     )
-    corr, p = pearsonr(x=df[color], y=df[col])
+    
+    # Handle Nan filtering
+    corr, p = (None, None)
+    if len(df[color]) > 1 and len(df[color]) > 1:
+        corr, p = pearsonr(x=df[color], y=df[col])
+        corr = round(corr, 3)
+        p = round(p, 3)
+    else:
+        corr = "No indicator rows for this filtering combination"
+        p = "refer to corr"
     corr_div = html.Div(
         [
             html.P(
                 [
                     "Correlation",
                     html.Br(),
-                    f"corr: {round(corr, 2)}",
+                    f"corr: {corr}",
                     html.Br(),
-                    f"p-value: {round(p, 3)}"
+                    f"p-value: {p}"
                 ]
             )
         ],
@@ -436,5 +452,6 @@ def update_stats(county, col, color):
         }
     )
 
+# set debug to True if you want to play around with it
 if __name__ == '__main__':
     app.run(debug=True)
