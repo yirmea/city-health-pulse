@@ -64,6 +64,8 @@ def get_selectors():
                         data["CountyName"].unique(), 
                         'Los Angeles', 
                         id='county',
+                        clearable=False,
+                        searchable=False, 
                         style={
                             "align-self": "center",
                             "width": "100%"
@@ -89,7 +91,9 @@ def get_selectors():
                         style={
                             "align-self": "center", 
                             "width": "100%",
-                        }
+                        },
+                        clearable=False,
+                        searchable=False,
                     ),
                 ], 
                 style={
@@ -107,7 +111,9 @@ def get_selectors():
                     dcc.Dropdown(
                         get_colors(),
                         "LILATracts_halfAnd10",
-                        id='color', 
+                        id='color',
+                        clearable=False, 
+                        searchable=False, 
                     ),
                 ], 
                 style={
@@ -152,7 +158,7 @@ def get_left():
                             dcc.Graph(
                                 id='stats-graph',
                                 style={
-                                    "align-self": "center"
+                                    "align-self": "flex-start"
                                 }
                             ),
                         ],
@@ -160,7 +166,7 @@ def get_left():
                             "display": "flex",
                             "flex-direction": "column",
                             "justify-content": "center",
-                            "align-self": "center"
+                            "align-self": "flex-start"
                         }
                     ),
                 ], 
@@ -311,7 +317,7 @@ def update_stats_graph(value, col, color):
     
     data_min = data[col].min()
     data_max = data[col].max()
-    bin_width = (data_max - data_min) / 40
+    bin_width = (data_max - data_min) / 70
     bins = dict(
         start=data[col].min(),
         end=data[col].max(),
